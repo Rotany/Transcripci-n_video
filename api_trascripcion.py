@@ -1,6 +1,10 @@
 from flask import Flask, jsonify, request
 from youtube_transcript_api import YouTubeTranscriptApi
 import nltk
+from bs4 import BeautifulSoup
+from nltk.tokenize import sent_tokenize, word_tokenize
+
+import re
 nltk.download('punkt')
 
 app = Flask(__name__)
@@ -20,15 +24,32 @@ def transcribe():
     text_lines = [line['text']
                    for line in transcript_video]
     text = ' '.join(text_lines)
-    sentences = nltk.sent_tokenize(text)
 
-    # Segmentar las oraciones en pasos de la receta
+    # Limpiar el texto de cualquier HTML
+    soup = BeautifulSoup(text, "html.parser")
+    clean_text = soup.get_text()
+
+    #Elimina caracteres no deseados
+    clean_text = re.sub(r'\s+', ' ', clean_text)  # Reemplazar múltiples espacios por un solo espacio
+    clean_text = re.sub(r'\[.*?\]', '', clean_text)  # Eliminar contenido entre corchetes (e.g., [ Aplausos ])
+
+    # Tokenización de oraciones
+    sentences = sent_tokenize(clean_text)
+
+     #Segmentar las oraciones en pasos de la receta
     recipe_steps = []
+    current_step = ""
     for sentence in sentences:
-        if any(char.isdigit() for char in sentence):
-            recipe_steps.append(sentence)
-
-    return jsonify({'transcription': recipe_steps})
+        if any(keyword in sentence.lower() for keyword in ["primero", "luego", "después", "finalmente"]) or any(char.isdigit() for char in sentence):
+            if current_step:
+                recipe_steps.append(current_step.strip())
+            current_step = sentence
+        else:
+            current_step += " " + sentence
+    if current_step:
+        recipe_steps.append(current_step.strip())
+        
+    return jsonify({'transcription':recipe_steps})
 
 
 app.run(debug=True)

@@ -1,3 +1,4 @@
 flask
 youtube-transcript-api
-nltk
+nltk==3.5
+bs4
