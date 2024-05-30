@@ -3,3 +3,6 @@ flask-cors
 youtube-transcript-api
 nltk==3.5
 bs4
+langchain
+youtube-transcript-api 
+pytube 
