@@ -6,3 +6,5 @@ bs4
 langchain
 youtube-transcript-api 
 pytube 
+python-dotenv==1.0.1
+openai==1.32.0
