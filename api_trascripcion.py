@@ -5,8 +5,18 @@ from flask_cors import CORS, cross_origin
 from langchain_community.llms import OpenAI
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import YoutubeLoader
+from models import YoutubeTranscription, db
+import os
+
 app = Flask(__name__)
 CORS(app, support_credentials=True)
+app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql+psycopg2://{os.environ["DB_USER"]}:{os.environ["DB_PASSWORD"]}@localhost:5432/{os.environ["DB_NAME"]}'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+
+db.init_app(app)
+
+# Create the tables within the app context
 
 @app.route('/', methods=['GET'])
 def home():
