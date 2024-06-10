@@ -17,6 +17,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
 # Create the tables within the app context
+with app.app_context():
+    db.create_all()
 
 @app.route('/', methods=['GET'])
 def home():
@@ -32,16 +34,35 @@ def transcribe():
     
     loader= YoutubeLoader(video_id, add_video_info= True, language= ['es'])
     documents = loader.load()
-    #for doc in documents:
-            #print(doc)
     
     text = ' '.join([doc.page_content for doc in documents])
     title = documents[0].metadata['title'] if 'title' in documents[0].metadata else 'Sin título'
+    imagen = documents[0].metadata['thumbnail_url'] if 'thumbnail_url' in documents[0].metadata else None
+    
+    # a partir del titulo construir el uri, sin espacios sin acentos todo en minuscula
     
     cleaned_text= limpiar_text(text)
+    transcription = YoutubeTranscription(
+        id=video_id, titulo=title, contenido_transcription=cleaned_text,
+        imagen=imagen
+    )
+    db.session.add(transcription)
+    db.session.commit()
     
     return jsonify({'title': title,'transcription':cleaned_text})
 
+@app.route("/api/v1/youtube_transcription", methods=['GET'])
+def get_youtube_transcription():
+    youtube_trascriptions = YoutubeTranscription.query.all()
+    lista_vacia = []
+    print(youtube_trascriptions)
+    for transctetet in youtube_trascriptions:
+        trans = {'id': transctetet.id, 'title':transctetet.titulo, 'contenido_transcription':transctetet.contenido_transcription}
+        lista_vacia.append(trans)
+    return jsonify({'items': lista_vacia})
+
+                                                                                                                                                                                                                                                                                                                   
+                                                  
 if __name__ == '__main__':
     app.run(debug=True)
     
