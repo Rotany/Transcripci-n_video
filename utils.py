@@ -3,6 +3,8 @@ from bs4 import BeautifulSoup
 from nltk.tokenize import sent_tokenize
 import re
 nltk.download('punkt')
+import unicodedata 
+import re
 
 
 # Limpiar el texto de cualquier HTML
@@ -16,6 +18,13 @@ def limpiar_text(text):
 
     # Tokenización de oraciones
     return sent_tokenize(clean_text)
+
+def construir_uri(title):
+        title = unicodedata.normalize('NFD', title)
+        title= ''.join(c for c in title if unicodedata.category(c) != 'Mn')
+        title = title.lower()
+        title = re.sub(r'[^a-z0-9\-]', '', title)
+        return title
 
 
 
