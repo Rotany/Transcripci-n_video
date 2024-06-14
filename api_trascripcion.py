@@ -7,6 +7,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import YoutubeLoader
 from models import YoutubeTranscription, db
 import os
+from datetime import datetime
 
 app = Flask(__name__)
 CORS(app, support_credentials=True)
@@ -34,24 +35,22 @@ def transcribe():
     
     existing_transcription = YoutubeTranscription.query.get(video_id)
     if existing_transcription:
-        return jsonify({'error': 'La transcripción ya existe'}),
+        return jsonify({'error': 'La transcripción ya existe'}), 409
     
-    
+    fecha_creacion = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     loader= YoutubeLoader(video_id, add_video_info= True, language= ['es'])
     documents = loader.load()
     
     text = ' '.join([doc.page_content for doc in documents])
     title = documents[0].metadata['title'] if 'title' in documents[0].metadata else 'Sin título'
     imagen = documents[0].metadata['thumbnail_url'] if 'thumbnail_url' in documents[0].metadata else None
-
+    
     uri = construir_uri(title)
-    
-    
-    cleaned_text= limpiar_text(text)
+    cleaned_text = limpiar_text(text)
 
     transcription = YoutubeTranscription(
         id=video_id, titulo=title, contenido_transcription=cleaned_text,
-        imagen=imagen, uri=uri
+        imagen=imagen, uri=uri, fecha_inicio=fecha_creacion
     )
     db.session.add(transcription)
     db.session.commit()
@@ -61,11 +60,7 @@ def transcribe():
 @app.route("/api/v1/youtube_transcription", methods=['GET'])
 def get_youtube_transcription():
     youtube_trascriptions = YoutubeTranscription.query.all()
-    lista_vacia = []
-    print(youtube_trascriptions)
-    for transctetet in youtube_trascriptions:
-        transcription_list = [{'id': transctetet.id, 'title':transctetet.titulo, 'contenido_transcription': transctetet.contenido_transcription} for transctetet in youtube_trascriptions]
-        lista_vacia.append(transcription_list)
+    lista_vacia = [{'id': t.id, 'title': t.titulo, 'contenido_transcription': t.contenido_transcription} for t in youtube_trascriptions]
     return jsonify({'items': lista_vacia})
 
 
