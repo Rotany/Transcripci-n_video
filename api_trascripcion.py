@@ -2,12 +2,17 @@ from flask import Flask, jsonify, request
 from youtube_transcript_api import YouTubeTranscriptApi
 from utils import limpiar_text, construir_uri
 from flask_cors import CORS, cross_origin
-from langchain_community.llms import OpenAI
+#from langchain_community.llms import openai
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import YoutubeLoader
+from langchain.chains.summarize import load_summarize_chain
 from models import YoutubeTranscription, db
 import os
 from datetime import datetime
+import openai
+
+openai.api_key=os.environ['OPENAI_KEY']
+#client = OpenAI(api_key=openai_api_key)
 
 app = Flask(__name__)
 CORS(app, support_credentials=True)
@@ -35,7 +40,8 @@ def transcribe():
     
     existing_transcription = YoutubeTranscription.query.get(video_id)
     if existing_transcription:
-        return jsonify({'error': 'La transcripción ya existe'}), 409
+        pass
+        #return jsonify({'error': 'La transcripción ya existe'}), 409
     
     fecha_creacion = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     loader= YoutubeLoader(video_id, add_video_info= True, language= ['es'])
@@ -43,10 +49,24 @@ def transcribe():
     
     text = ' '.join([doc.page_content for doc in documents])
     title = documents[0].metadata['title'] if 'title' in documents[0].metadata else 'Sin título'
+    print(f'Título del video: {title}')
     imagen = documents[0].metadata['thumbnail_url'] if 'thumbnail_url' in documents[0].metadata else None
     
     uri = construir_uri(title)
-    cleaned_text = limpiar_text(text)
+    cleaned_text = limpiar_text(text)[0]
+
+    response = openai.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+                {"role": "system", "content": "Eres un experto en crear archivos html y quiero que el texto que te voy a pasar me lo conviertas en un archivo html."},
+                {"role": "user", "content": cleaned_text}
+            ],
+        temperature=0
+    )
+    
+    print(response.choices[0].message.content)
+
+
 
     transcription = YoutubeTranscription(
         id=video_id, titulo=title, contenido_transcription=cleaned_text,

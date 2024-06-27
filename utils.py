@@ -11,11 +11,13 @@ import re
 def limpiar_text(text):    
     soup = BeautifulSoup(text, "html.parser")
     clean_text = soup.get_text()
+   
 
     #Elimina caracteres no deseados
     clean_text = re.sub(r'\s+', ' ', clean_text)  # Reemplazar múltiples espacios por un solo espacio
     clean_text = re.sub(r'\[.*?\]', '', clean_text)  # Eliminar contenido entre corchetes (e.g., [ Aplausos ])
-
+    print(clean_text)
+    print("^^^^^^^^^^^^^^^^^^^^^^^^")
     # Tokenización de oraciones
     return sent_tokenize(clean_text)
 
