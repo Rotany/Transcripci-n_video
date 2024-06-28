@@ -54,28 +54,35 @@ def transcribe():
     
     uri = construir_uri(title)
     cleaned_text = limpiar_text(text)[0]
+    system_content = (
+        "Eres un experto en crear archivos html a partir de texto. Quiero que conviertas 'todo el texto' que te voy a pasar en un archivo html. De hecho solo quiero que me pases el contenido del body.", 
+    "No quiero justificacion de lo que me has hecho solo quiero que me pases directamente el html.",
+    "No quiero que me crees unicamente un solo div con un solo parrafo.",
+    "El texto que te voy a pasar siempre va estar relacionado con cocina.",
+    "Me gustaria que tuviera varios div y varis parrafos, si puedes añadir tambien una lista de ingredientes siempre que lo mencione"
+    )
 
     response = openai.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
-                {"role": "system", "content": "Eres un experto en crear archivos html y quiero que el texto que te voy a pasar me lo conviertas en un archivo html."},
+                {"role": "system", "content": str(system_content)},
                 {"role": "user", "content": cleaned_text}
             ],
         temperature=0
     )
     
-    print(response.choices[0].message.content)
+    content_html = response.choices[0].message.content
 
 
 
     transcription = YoutubeTranscription(
         id=video_id, titulo=title, contenido_transcription=cleaned_text,
-        imagen=imagen, uri=uri, fecha_inicio=fecha_creacion
+        imagen=imagen, uri=uri, fecha_inicio=fecha_creacion, contenido_html=content_html
     )
     db.session.add(transcription)
     db.session.commit()
     
-    return jsonify({'title': title,'transcription':cleaned_text})
+    return jsonify({'title': title,'transcription':cleaned_text, 'content_html': content_html})
 
 @app.route("/api/v1/youtube_transcription", methods=['GET'])
 def get_youtube_transcription():
