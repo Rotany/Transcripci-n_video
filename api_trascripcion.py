@@ -50,9 +50,11 @@ def transcribe():
     
     uri = construir_uri(title)
     cleaned_text = limpiar_text(text)[0]
+    print(f'cleane: {cleaned_text}')
     text_anonymized = call_chatgpt(cleaned_text,system_content_anonymize_transcription,temperature=0.2)
+    print(f'anonimaze: {text_anonymized}')
     content_html = call_chatgpt(text_anonymized, system_content_create_html_from_transcription)
-
+    print(f'html: {content_html}')
     transcription = YoutubeTranscription(
         id=video_id, titulo=title, contenido_transcription=cleaned_text,
         imagen=imagen, uri=uri, fecha_inicio=fecha_creacion, contenido_html=content_html
