@@ -20,6 +20,14 @@ system_content_anonymize_transcription = (
     "Tu respuesta debe ser únicamente el texto ya anonimizado, sin explicaciones adicionales ni comentarios. Gracias."
 )
 
+system_content_anonymize_titulo = (
+    "Eres un experto en anonimizar transcripciones. He conseguido transcripciones de diferentes personas de plataformas de video especialmente YouTube. ",
+    "No quiero tener ningun problema legal, así que necesito que anonimices el 'Title' del texto de las transcripciones. Para ello, por favor omite los titulos que contengan el nombre del canal, o cualquier otro nombre solo quiero el nombre de la receta.",
+    "Por ejemplo, elimina frases como Sopa de Camaron |'Rosita' o 'kwa."
+    "Además, modifica el titulo para que no sea idéntico al del video. Puedes añadir contenido nuevo o eliminar partes, siempre respetando la esencia del contenido, que trata sobre cocina o recetas de cocina. ",
+    "Tu respuesta debe ser únicamente el titulo ya anonimizado, sin explicaciones adicionales ni comentarios. Gracias."
+)
+
 
 def call_chatgpt(cleaned_text:str, system_content, model="gpt-3.5-turbo", temperature=0):
     response = openai.chat.completions.create(

@@ -6,7 +6,7 @@ from models import YoutubeTranscription, db
 import os
 from datetime import datetime
 import openai
-from openai_utils import call_chatgpt, system_content_create_html_from_transcription, system_content_anonymize_transcription
+from openai_utils import call_chatgpt, system_content_create_html_from_transcription, system_content_anonymize_transcription,system_content_anonymize_titulo
 
 openai.api_key=os.environ['OPENAI_KEY']
 
@@ -45,24 +45,21 @@ def transcribe():
     
     text = ' '.join([doc.page_content for doc in documents])
     title = documents[0].metadata['title'] if 'title' in documents[0].metadata else 'Sin título'
-    print(f'Título del video: {title}')
+    title_anonymized = call_chatgpt(title,system_content_anonymize_titulo)
     imagen = documents[0].metadata['thumbnail_url'] if 'thumbnail_url' in documents[0].metadata else None
     
-    uri = construir_uri(title)
+    uri = construir_uri(title_anonymized)
     cleaned_text = limpiar_text(text)[0]
-    print(f'cleane: {cleaned_text}')
     text_anonymized = call_chatgpt(cleaned_text,system_content_anonymize_transcription,temperature=0.2)
-    print(f'anonimaze: {text_anonymized}')
     content_html = call_chatgpt(text_anonymized, system_content_create_html_from_transcription)
-    print(f'html: {content_html}')
     transcription = YoutubeTranscription(
-        id=video_id, titulo=title, contenido_transcription=cleaned_text,
+        id=video_id, titulo=title_anonymized, contenido_transcription=text_anonymized,
         imagen=imagen, uri=uri, fecha_inicio=fecha_creacion, contenido_html=content_html
     )
     db.session.add(transcription)
     db.session.commit()
     
-    return jsonify({'title': title,'transcription':cleaned_text, 'content_html': content_html})
+    return jsonify({'title': title_anonymized,'transcription':text_anonymized, 'content_html': content_html})
 
 @app.route("/api/v1/youtube_transcription", methods=['GET'])
 def get_youtube_transcription():
