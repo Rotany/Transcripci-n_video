@@ -15,3 +15,4 @@ class YoutubeTranscription(db.Model):
     fecha_final = db.Column(db.DateTime(timezone=True), server_default=func.now())
     uri = db.Column(db.String)
     imagen = db.Column(db.Text)
+    meta_description = db.Column(db.String(100))

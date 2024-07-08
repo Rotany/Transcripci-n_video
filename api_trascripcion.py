@@ -6,7 +6,7 @@ from models import YoutubeTranscription, db
 import os
 from datetime import datetime
 import openai
-from openai_utils import call_chatgpt, system_content_create_html_from_transcription, system_content_anonymize_transcription,system_content_anonymize_titulo
+from openai_utils import call_chatgpt, system_content_create_html_from_transcription, system_content_anonymize_transcription,system_content_anonymize_titulo,system_content_meta_description
 
 openai.api_key=os.environ['OPENAI_KEY']
 
@@ -46,15 +46,19 @@ def transcribe():
     text = ' '.join([doc.page_content for doc in documents])
     title = documents[0].metadata['title'] if 'title' in documents[0].metadata else 'Sin título'
     title_anonymized = call_chatgpt(title,system_content_anonymize_titulo)
-    imagen = documents[0].metadata['thumbnail_url'] if 'thumbnail_url' in documents[0].metadata else None
+    #imagen = documents[0].metadata['thumbnail_url'] if 'thumbnail_url' in documents[0].metadata else None
     
     uri = construir_uri(title_anonymized)
     cleaned_text = limpiar_text(text)[0]
     text_anonymized = call_chatgpt(cleaned_text,system_content_anonymize_transcription,temperature=0.2)
+    meta_description = call_chatgpt(text_anonymized,system_content_meta_description)
+
     content_html = call_chatgpt(text_anonymized, system_content_create_html_from_transcription)
+
+
     transcription = YoutubeTranscription(
         id=video_id, titulo=title_anonymized, contenido_transcription=text_anonymized,
-        imagen=imagen, uri=uri, fecha_inicio=fecha_creacion, contenido_html=content_html
+        uri=uri, fecha_inicio=fecha_creacion, contenido_html=content_html, meta_description = meta_description
     )
     db.session.add(transcription)
     db.session.commit()

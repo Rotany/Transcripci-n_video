@@ -28,6 +28,10 @@ system_content_anonymize_titulo = (
     "Tu respuesta debe ser únicamente el titulo ya anonimizado, sin explicaciones adicionales ni comentarios. Gracias."
 )
 
+system_content_meta_description = (
+    "Eres un asistente experto en SEO. Tu tarea es generar una meta descripción para el siguiente texto." 
+    "La meta descripción debe ser concisa, atractiva y no exceder los 100 caracteres. Si es necesario, usa puntos suspensivos al final para indicar que el texto ha sido truncado."
+)
 
 def call_chatgpt(cleaned_text:str, system_content, model="gpt-3.5-turbo", temperature=0):
     response = openai.chat.completions.create(
@@ -40,3 +44,7 @@ def call_chatgpt(cleaned_text:str, system_content, model="gpt-3.5-turbo", temper
     )
     contenido_html = response.choices[0].message.content
     return contenido_html
+
+
+
+
