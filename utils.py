@@ -43,6 +43,7 @@ def generate_html_from_json(json_data):
     html_content = template_html.replace('"""title"""', f'<title>{blog_title}</title>')
     html_content = html_content.replace('"""body"""', json_data['html_content'])
     html_content = html_content.replace('"""description"""', f'<meta name="description" content="{blog_meta_description}">')
+    html_content = html_content.replace("```html", "").replace("```", "")
 
     output_filename = f'{blog_uri}.html'
 

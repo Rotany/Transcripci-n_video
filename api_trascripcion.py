@@ -46,14 +46,13 @@ def transcribe():
     text = ' '.join([doc.page_content for doc in documents])
     title = documents[0].metadata['title'] if 'title' in documents[0].metadata else 'Sin título'
     title_anonymized = call_chatgpt(title,system_content_anonymize_titulo)
-    #imagen = documents[0].metadata['thumbnail_url'] if 'thumbnail_url' in documents[0].metadata else None
     
     uri = construir_uri(title_anonymized)
     cleaned_text = limpiar_text(text)[0]
-    text_anonymized = call_chatgpt(cleaned_text,system_content_anonymize_transcription,temperature=0.2)
+    text_anonymized = call_chatgpt(cleaned_text,system_content_anonymize_transcription,temperature=0.2, model="gpt-4o")
     meta_description = call_chatgpt(text_anonymized, system_content_meta_description)
 
-    content_html = call_chatgpt(text_anonymized, system_content_create_html_from_transcription)
+    content_html = call_chatgpt(text_anonymized, system_content_create_html_from_transcription, model="gpt-4o")
 
 
     transcription = YoutubeTranscription(
