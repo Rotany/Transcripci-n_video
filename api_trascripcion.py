@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-from utils import limpiar_text, construir_uri
+from utils import generate_html_from_json, limpiar_text, construir_uri
 from flask_cors import CORS, cross_origin
 from langchain_community.document_loaders import YoutubeLoader
 from models import YoutubeTranscription, db
@@ -51,7 +51,7 @@ def transcribe():
     uri = construir_uri(title_anonymized)
     cleaned_text = limpiar_text(text)[0]
     text_anonymized = call_chatgpt(cleaned_text,system_content_anonymize_transcription,temperature=0.2)
-    meta_description = call_chatgpt(text_anonymized,system_content_meta_description)
+    meta_description = call_chatgpt(text_anonymized, system_content_meta_description)
 
     content_html = call_chatgpt(text_anonymized, system_content_create_html_from_transcription)
 
@@ -90,7 +90,32 @@ def delete_transcription():
 
     return jsonify({'message': 'Transcripción eliminada exitosamente'}), 200
     
+@app.route('/api/v1/generate_blogs', methods=['POST'])
+def generate_blogs():
+    youtube_trascriptions = YoutubeTranscription.query.all()
+    transcriptions_content = [
+        {
+            'title': t.titulo,
+            "html_content": t.contenido_html,
+            "meta_description": t.meta_description,
+            "uri": t.uri
+            }
+        for t in youtube_trascriptions
+    ]
+    files_created = []
+    for data in transcriptions_content:
+        filename_created = generate_html_from_json(data)
+        if filename_created:
+            files_created.append(filename_created)
 
+
+    return jsonify({
+        'message': 'Transcripción pasada a blog',
+        'files created': files_created 
+        }), 200
+
+
+    
 
                                                                                                                                                                                                                                                                                                                    
                                                   
