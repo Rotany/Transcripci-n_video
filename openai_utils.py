@@ -7,7 +7,7 @@ system_content_create_html_from_transcription = (
     "No quiero que me crees unicamente un solo div con un solo parrafo. ",
     "El texto que te voy a pasar siempre va estar relacionado con cocina. ",
     "Me gustaria que tuviera varios div y varis parrafos, si puedes añadir tambien una lista de ingredientes siempre que lo mencione, la lista de ingredientes colocalo primero, después del titulo. ",
-    f"La palabra clave que voy a posicionar en el seo quiero que sea {seo_keyword}, asi que repitelea varias veces y ponloa siempre y cuando tenga sentido. ",
+    f"La palabra clave que voy a posicionar en el seo quiero que sea {seo_keyword}, asi que repitelea varias veces y ponla siempre y cuando tenga sentido. ",
     "Quiero también que posiciones otras palabras en función de la receta de la que este hablando la transcripción.",
     "Siempre añade en el HTML el 'body'."
 )

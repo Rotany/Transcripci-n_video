@@ -36,8 +36,7 @@ def transcribe():
     
     existing_transcription = YoutubeTranscription.query.get(video_id)
     if existing_transcription:
-        pass
-        #return jsonify({'error': 'La transcripción ya existe'}), 409
+        return jsonify({'error': 'La transcripción ya existe'}), 409
     
     fecha_creacion = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     loader= YoutubeLoader(video_id, add_video_info= True, language= ['es'])
