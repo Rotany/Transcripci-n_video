@@ -23,12 +23,12 @@ def limpiar_text(text):
     return sent_tokenize(clean_text)
 
 def construir_uri(title):
-    title = unicodedata.normalize('NFD', title)
-    title = ''.join(c for c in title if unicodedata.category(c) != 'Mn')
+    title = unicodedata.normalize('NFD', title)  # Normaliza el título para descomponer caracteres Unicode.
+    title = ''.join(c for c in title if unicodedata.category(c) != 'Mn')  # Elimina los diacríticos de los caracteres.
     title = title.lower()
-    title = re.sub(r'[^a-z0-9\-]', '-', title)
-    title = re.sub(r'-+', '-', title)
-    title = title.strip('-')
+    title = re.sub(r'[^a-z0-9\-]', '-', title)  # Reemplaza caracteres no permitidos con guiones.
+    title = re.sub(r'-+', '-', title)  # Remplaza múltiples guiones consecutivos en uno solo.
+    title = title.strip('-')  # Limpia los guiones al inicio y al final del título.
     return title
 
 
