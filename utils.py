@@ -8,27 +8,21 @@ import unicodedata
 import re
 
 
-# Limpiar el texto de cualquier HTML
 def limpiar_text(text):    
-    soup = BeautifulSoup(text, "html.parser")
-    clean_text = soup.get_text()
-   
-
-    #Elimina caracteres no deseados
-    clean_text = re.sub(r'\s+', ' ', clean_text)  # Reemplazar múltiples espacios por un solo espacio
-    clean_text = re.sub(r'\[.*?\]', '', clean_text)  # Eliminar contenido entre corchetes (e.g., [ Aplausos ])
+    soup = BeautifulSoup(text, "html.parser")     
+    clean_text = re.sub(r'\s+', ' ', clean_text)  
+    clean_text = re.sub(r'\[.*?\]', '', clean_text)  
     print(clean_text)
     print("^^^^^^^^^^^^^^^^^^^^^^^^")
-    # Tokenización de oraciones
     return sent_tokenize(clean_text)
 
 def construir_uri(title):
-    title = unicodedata.normalize('NFD', title)  # Normaliza el título para descomponer caracteres Unicode.
-    title = ''.join(c for c in title if unicodedata.category(c) != 'Mn')  # Elimina los diacríticos de los caracteres.
+    title = unicodedata.normalize('NFD', title)     # Normaliza el título para descomponer caracteres Unicode.
+    title = ''.join(c for c in title if unicodedata.category(c) != 'Mn')    # Elimina los diacríticos de los caracteres.
     title = title.lower()
-    title = re.sub(r'[^a-z0-9\-]', '-', title)  # Reemplaza caracteres no permitidos con guiones.
-    title = re.sub(r'-+', '-', title)  # Remplaza múltiples guiones consecutivos en uno solo.
-    title = title.strip('-')  # Limpia los guiones al inicio y al final del título.
+    title = re.sub(r'[^a-z0-9\-]', '-', title)     # Reemplaza caracteres no permitidos con guiones.
+    title = re.sub(r'-+', '-', title)     # Remplaza múltiples guiones consecutivos en uno solo.
+    title = title.strip('-')     # Limpia los guiones al inicio y al final del título.
     return title
 
 

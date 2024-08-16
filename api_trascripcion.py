@@ -12,13 +12,13 @@ openai.api_key=os.environ['OPENAI_KEY']
 
 app = Flask(__name__)
 CORS(app, support_credentials=True)
+
 app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql+psycopg2://{os.environ["DB_USER"]}:{os.environ["DB_PASSWORD"]}@localhost:5432/{os.environ["DB_NAME"]}'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 
 db.init_app(app)
-
-# Create the tables within the app context
 with app.app_context():
     db.create_all()
 
