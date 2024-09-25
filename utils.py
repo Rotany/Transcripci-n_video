@@ -9,7 +9,8 @@ import re
 
 
 def limpiar_text(text):    
-    soup = BeautifulSoup(text, "html.parser")     
+    soup = BeautifulSoup(text, "html.parser")
+    clean_text = soup.get_text()
     clean_text = re.sub(r'\s+', ' ', clean_text)  
     clean_text = re.sub(r'\[.*?\]', '', clean_text)  
     print(clean_text)
